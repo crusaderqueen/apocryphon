@@ -18,16 +18,11 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 
 const scene = new THREE.Scene()
-const geometry = new THREE.BoxGeometry( 0, 0, 0 );
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube )
 
 scene.background = new Color('lightgray');
 
 
 // HDR Mapping
-
 
 const rgbeLoader = new RGBELoader();
 rgbeLoader.load(environmentURL, function(texture){
@@ -38,6 +33,15 @@ rgbeLoader.load(environmentURL, function(texture){
 })
 
 
+// Origin
+
+const geometry = new THREE.BoxGeometry( 0, 0, 0 );
+const material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+const origin = new THREE.Mesh( geometry, material );
+
+scene.add( origin )
+
+
 // GLTF Loader 
 
 const loader = new GLTFLoader();
@@ -46,7 +50,7 @@ const loader = new GLTFLoader();
 loader.load( modelUrl.href, function ( gltf ) {
 
 		let model = gltf.scene;
-      cube.add( model );
+    origin.add( model );
 
 	},
 	// called while loading is progressing
@@ -144,10 +148,11 @@ const clock = new THREE.Clock()
 async function tick() {
 
     const elapsedTime = clock.getElapsedTime()
-    // let model = scene.children
     // Update objects
-    cube.rotation.y = .2 * elapsedTime
-    cube.rotation.z = .1 * elapsedTime
+    
+    // 
+    origin.rotation.y = .2 * elapsedTime
+    origin.rotation.z = .1 * elapsedTime
     
     // Update Orbital Controls
     controls.update()
