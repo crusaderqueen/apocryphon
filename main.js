@@ -7,7 +7,6 @@ import { Color } from '/node_modules/three'
 import { RGBELoader } from '/node_modules/three/examples/jsm/loaders/RGBELoader.js'
 
 // URLs
-
 const environmentURL = new URL('./public/environmentMap.hdr', import.meta.url)
 const modelUrl = new URL('./public/apocryphon.glb' , import.meta.url);
 
@@ -19,6 +18,11 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 
 const scene = new THREE.Scene()
+const geometry = new THREE.BoxGeometry( 0, 0, 0 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube )
+
 scene.background = new Color('lightgray');
 
 
@@ -42,7 +46,7 @@ const loader = new GLTFLoader();
 loader.load( modelUrl.href, function ( gltf ) {
 
 		let model = gltf.scene;
-        scene.add( model );
+      cube.add( model );
 
 	},
 	// called while loading is progressing
@@ -140,10 +144,11 @@ const clock = new THREE.Clock()
 async function tick() {
 
     const elapsedTime = clock.getElapsedTime()
-
+    // let model = scene.children
     // Update objects
-    // < model to be defined >.rotation.y = .5 * elapsedTime
-
+    cube.rotation.y = .2 * elapsedTime
+    cube.rotation.z = .1 * elapsedTime
+    
     // Update Orbital Controls
     controls.update()
 
@@ -155,3 +160,4 @@ async function tick() {
 }
 
 tick();
+
