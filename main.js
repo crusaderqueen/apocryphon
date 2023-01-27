@@ -122,14 +122,13 @@ scene.add(camera)
 
 
 // Lights
+// * The reason we add all lights to the scene as a child of camera is because we dont want the lightning to be changed by rotation of the ring. It makes the light ambient.
 
-const cameraPointLight1 = new THREE.PointLight('white', 8.5/2)
-
-cameraPointLight1.position.x = 5
-cameraPointLight1.position.y = 10
-cameraPointLight1.position.z = 4
-camera.add(cameraPointLight1)
-
+const punctualLight = new THREE.PointLight('LightSteelBlue', 2.5)
+punctualLight.position.x = -1
+punctualLight.position.y = 1
+punctualLight.position.z = -1
+camera.add(punctualLight)
 
 // Controls
 
