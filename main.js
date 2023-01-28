@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 const canvas = document.querySelector('canvas.webgl');
+
 const scene = new THREE.Scene();
 const color = new THREE.Color('gainsboro');
 scene.background = color;
