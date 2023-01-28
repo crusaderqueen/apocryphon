@@ -1,167 +1,118 @@
-import './style.css'
-import './style.css'
-import * as THREE from '/node_modules/three'
-import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js'
-import { GLTFLoader } from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js'
-import { Color } from '/node_modules/three'
-import { RGBELoader } from '/node_modules/three/examples/jsm/loaders/RGBELoader.js'
+/* eslint-disable no-use-before-define */
+/* eslint-disable import/extensions */
+import './style.css';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
-// URLs
-const environmentURL = new URL('./public/environmentMap.hdr', import.meta.url)
-const modelUrl = new URL('./public/apocryphon.glb' , import.meta.url);
+const canvas = document.querySelector('canvas.webgl');
+const scene = new THREE.Scene();
+const color = new THREE.Color('gainsboro');
+scene.background = color;
 
-// Canvas
+const loadingManager = new THREE.LoadingManager();
+const progressBar = document.getElementById('progress-bar');
+loadingManager.onProgress = (_url, loaded, total) => {
+  progressBar.value = (loaded / total) * 100;
+};
 
-const canvas = document.querySelector('canvas.webgl')
+const progressBarContainer = document.querySelector('.progress-bar-container');
+loadingManager.onLoad = () => {
+  progressBarContainer.style.display = 'none';
+};
 
+const origin = new THREE.Mesh();
+scene.add(origin);
 
-// Scene
+const environmentURL = new URL('./public/environmentMap.hdr', import.meta.url);
+const hdrLoader = new RGBELoader(loadingManager);
+hdrLoader.load(environmentURL, (hdr) => {
+  // eslint-disable-next-line no-param-reassign
+  hdr.mapping = THREE.EquirectangularReflectionMapping;
+  scene.environment = hdr;
+});
 
-const scene = new THREE.Scene()
-
-scene.background = new Color('lightgray');
-
-
-// HDR Mapping
-
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load(environmentURL, function(texture){
-
-    texture.mapping = THREE.EquirectangularReflectionMapping;
-
-    scene.environment = texture;
-})
-
-
-// Origin
-
-const geometry = new THREE.BoxGeometry( 0, 0, 0 );
-const material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-const origin = new THREE.Mesh( geometry, material );
-
-scene.add( origin )
-
-
-// GLTF Loader 
-
-const loader = new GLTFLoader();
-
-
-loader.load( modelUrl.href, function ( gltf ) {
-
-		let model = gltf.scene;
-    origin.add( model );
-
-	},
-	// called while loading is progressing
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-	},
-	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' );
-
-	}
-
+const modelUrl = new URL('./public/apocryphon.glb', import.meta.url);
+const loader = new GLTFLoader(loadingManager);
+loader.load(
+  modelUrl.href,
+  (gltf) => {
+    const model = gltf.scene;
+    origin.add(model);
+  },
 );
-
-
-// Sizes
 
 const sizes = {
 
-    width: window.innerWidth,
-    height: window.innerHeight
+  width: window.innerWidth,
+  height: window.innerHeight,
 
-}
+};
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
+window.addEventListener('resize', () => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
 
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1))
-})
-
-// Renderer
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
+});
 
 const renderer = new THREE.WebGLRenderer({
-  
+
   antialias: true,
-  canvas: canvas,
+  canvas,
 
-})
+});
 
-renderer.physicallyCorrectLights = true
-renderer.toneMapping = THREE.ACESFilmicToneMapping
-renderer.outputEncoding = THREE.sRGBEncoding
-renderer.toneMappingExposure = .45
+renderer.physicallyCorrectLights = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMappingExposure = 0.45;
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0));
 
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.0 ))
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
+camera.position.x = 0;
+camera.position.y = 0;
+camera.position.z = 1;
+scene.add(camera);
 
+// * All lights are children of camera, not scene because we want the lightning to be ambient.
+const punctualLight = new THREE.PointLight('LightSteelBlue', 2.5);
+punctualLight.position.x = -1;
+punctualLight.position.y = 1;
+punctualLight.position.z = -1;
+camera.add(punctualLight);
 
-// Base camera
-
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-
-camera.position.x = 0
-camera.position.y = 0
-camera.position.z = 1
-scene.add(camera)
-
-
-// Lights
-// * The reason we add all lights to the scene as a child of camera is because we dont want the lightning to be changed by rotation of the ring. It makes the light ambient.
-
-const punctualLight = new THREE.PointLight('LightSteelBlue', 2.5)
-punctualLight.position.x = -1
-punctualLight.position.y = 1
-punctualLight.position.z = -1
-camera.add(punctualLight)
-
-// Controls
-
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
 controls.minDistance = 0.5;
 controls.maxDistance = 5;
-controls.target.set( 0, 0, 0 );
+controls.target.set(0, 0, 0);
 controls.update();
 
-
-// Animate
-
-const clock = new THREE.Clock()
+const clock = new THREE.Clock();
 
 async function tick() {
+  const elapsedTime = clock.getElapsedTime();
+  // Update objects
 
-    const elapsedTime = clock.getElapsedTime()
-    // Update objects
-    
-    // 
-    origin.rotation.y = .2 * elapsedTime
-    origin.rotation.z = .1 * elapsedTime
-    
-    // Update Orbital Controls
-    controls.update()
+  //
+  origin.rotation.y = 0.2 * elapsedTime;
+  origin.rotation.z = 0.1 * elapsedTime;
 
-    // Render
-    renderer.render(scene, camera)
+  // Update Orbital Controls
+  controls.update();
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+  // Render
+  renderer.render(scene, camera);
+
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick);
 }
 
 tick();
-

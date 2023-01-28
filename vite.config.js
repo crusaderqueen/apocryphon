@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
+import * as vite from 'vite';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-    base: '/apocryphon/',
-})
+export default vite.defineConfig({
+  base: '/apocryphon/',
+});
