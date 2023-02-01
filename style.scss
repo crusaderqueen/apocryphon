@@ -1,5 +1,5 @@
 body {
-  font-family: Baskerville;
+  font-family: Baskerville; 
   margin: 0;
   display: flex;
   place-items: center;
@@ -20,26 +20,30 @@ body {
   justify-content: center;
   align-items: center;
   background-color: aliceblue;
+
 }
 
 #progress-bar {
   width: 50%;
-  margin-top: 0.5%;
+  margin-top: .5%;
   height: 5%;
   z-index: 200;
+
+  
 }
 
 .object-data {
   position: absolute;
-  font-family: "PenaCaldaria";
+  font-family: 'PenaCaldaria';
   left: 50%;
   top: 5%;
   transform: translate(-50%, -25%);
 }
 
+
 @font-face {
-  font-family: "PenaCaldaria";
-  src: url("/public/Pena-Caldaria.ttf") format("truetype");
-  font-style: normal;
-  font-weight: normal;
-}/*# sourceMappingURL=style.css.map */
+font-family: "PenaCaldaria"; 
+src: url("/public/Pena-Caldaria.ttf") format("truetype"); 
+font-style: normal; 
+font-weight: normal; 
+} 

@@ -9,8 +9,6 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 const canvas = document.querySelector('canvas.webgl');
 
 const scene = new THREE.Scene();
-const color = new THREE.Color('gainsboro');
-scene.background = color;
 
 const loadingManager = new THREE.LoadingManager();
 const progressBar = document.getElementById('progress-bar');
@@ -66,6 +64,7 @@ const renderer = new THREE.WebGLRenderer({
 
   antialias: true,
   canvas,
+  alpha: true,
 
 });
 
@@ -100,20 +99,11 @@ const clock = new THREE.Clock();
 
 async function tick() {
   const elapsedTime = clock.getElapsedTime();
-  // Update objects
-
-  //
   origin.rotation.y = 0.2 * elapsedTime;
   origin.rotation.z = 0.1 * elapsedTime;
-
-  // Update Orbital Controls
   controls.update();
-
-  // Render
   renderer.render(scene, camera);
-
-  // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 }
 
-tick();
+await tick();
